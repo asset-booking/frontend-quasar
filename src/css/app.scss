@@ -1,0 +1,70 @@
+// app global css in SCSS form
+.table-container {
+  overflow-x: scroll;
+  overflow-y: scroll;
+  max-height: 85vh;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  background: $col-header-day-color;
+  z-index: 3;
+}
+
+.column-day,
+.column-day-weekend,
+.header-column-day,
+.header-column-day-weekend {
+  min-width: $date-cell-size;
+}
+
+.column-day {
+  background-color: $col-day-color
+}
+
+.column-day-weekend {
+  background-color: $col-weekend-day-color
+}
+
+.header-column-day {
+  background-color: $col-header-day-color
+}
+
+.header-column-day-weekend {
+  background-color: $col-header-weekend-day-color
+}
+
+.asset-row {
+  height: $date-cell-size;
+  cursor: pointer;
+}
+
+.asset-row:hover .column-day,
+.asset-row:hover .column-day-weekend {
+  background-color: $hover-color;
+}
+
+.header-column {
+  padding: 5px;
+  z-index: 2;
+  font-size: smaller;
+  min-width: $header-column-width;
+  overflow: hidden;
+}
+
+.sticky-month-name {
+  position: sticky;
+  left: $header-column-width;
+  z-index: -1;
+}
+
+.header-column table {
+  text-align: left;
+  width: 100%;
+}
+
+.header-column span:empty::before {
+  content:"";
+  display:inline-block;
+}
