@@ -26,7 +26,7 @@ class AssetService implements IApiService<Asset> {
   }
 
   async getAll (): Promise<Asset[]> {
-    const response = await calendarApi.get('/api/reservations')
+    const response = await calendarApi.get('/api/assets')
     const data = response.data as AssetDto[] ?? []
     const result: Asset[] = []
     data.forEach(assetDto => {
