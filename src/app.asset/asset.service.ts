@@ -1,8 +1,8 @@
 import { IApiService } from 'src/app.common/api.service'
-import { calendarApi } from 'src/boot/axios'
 import { AssetDto } from './asset.dto'
 import { assetFactory } from './asset.factory'
 import { Asset } from './asset.model'
+import tempAssets from './temp.assets.json'
 
 class AssetService implements IApiService<Asset> {
   create (item: Asset): Promise<Asset> {
@@ -26,7 +26,8 @@ class AssetService implements IApiService<Asset> {
   }
 
   async getAll (): Promise<Asset[]> {
-    const response = await calendarApi.get('/api/assets')
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const response: any = { data: tempAssets }// await calendarApi.get('/api/reservations')
     const data = response.data as AssetDto[] ?? []
     const result: Asset[] = []
     data.forEach(assetDto => {
