@@ -1,12 +1,18 @@
 [
   {
     "id": 1,
-    "addressRef": "Address ref for asset 1",
+    "addressRef": "Short Location for asset 1",
+    "specs": "1",
+    "specsIcons": "king_bed",
+    "notes": "No smoking",
     "reservations": null
   },
   {
     "id": 2,
-    "addressRef": "Address ref for asset 2",
+    "addressRef": "Short Location for asset 1",
+    "specs": "2",
+    "specsIcons": "single_bed",
+    "notes": "No smoking",
     "reservations": [
       {
         "id": 1,
@@ -23,7 +29,10 @@
           "vatPercentage": 7,
           "total": 133.75
         },
-        "company": null
+        "company": {
+          "name": "Ex company name 1",
+          "coordinatorPhoneNr": "0151-7129085"
+        }
       },
       {
         "id": 2,
@@ -40,7 +49,10 @@
           "vatPercentage": 7,
           "total": 149.8
         },
-        "company": null
+        "company": {
+          "name": "Ex company name 2",
+          "coordinatorPhoneNr": "0151-7129085"
+        }
       },
       {
         "id": 3,
@@ -57,7 +69,10 @@
           "vatPercentage": 7,
           "total": 103.26
         },
-        "company": null
+        "company": {
+          "name": "Ex company name 3",
+          "coordinatorPhoneNr": "0151-7129085"
+        }
       }
     ]
   },
@@ -80,7 +95,10 @@
           "vatPercentage": 7,
           "total": 75.97
         },
-        "company": null
+        "company": {
+          "name": "Ex company name 4",
+          "coordinatorPhoneNr": "0151-7129085"
+        }
       }
     ]
   }

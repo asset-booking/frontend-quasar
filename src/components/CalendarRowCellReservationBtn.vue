@@ -13,7 +13,8 @@ const getBtnStyle = () => {
   const status = ReservationStatuses.getStatusbyId(props.reservation?.statusId)
 
   if (status) {
-    return `${calculateReservationBtnWidth()}background: ${status.colorCode};`
+    return `${calculateReservationBtnWidth()};
+    background: radial-gradient(50px 100% at left, transparent 50%, ${status.colorCode} 0%);`
   }
 }
 
@@ -22,7 +23,7 @@ const calculateReservationBtnWidth = () => {
     ? daysBetweenDates(props.reservation.startDate, props.reservation.endDate)
     : 0
 
-  return `width: calc(${numberOfDays * 100 - 110}% + ${numberOfDays}px);`
+  return `width: calc(${numberOfDays * 50}px - 30px)`
 }
 
 const tooltipClass = computed(() => `bg-${ReservationStatuses.getStatusbyId(props.reservation?.statusId)?.qColorCode}`)
@@ -42,8 +43,8 @@ const unhoverFirstColumn = () => {
     :style="getBtnStyle()"
     @mouseenter="unhoverFirstColumn"
     @mouseleave="() => notifyButtonHovered(false)">
-    <span v-if="reservation.company.name">{{ reservation.company.name }}</span>
-    <span v-if="reservation.company.telephoneNumber" class="q-ml-lg">{{ reservation.company.telephoneNumber }}</span>
+    <span style="color: white;">{{ reservation.costs.total }} - {{ reservation.company.name }}</span>
+    <span v-if="reservation.company.coordinatorPhoneNr" style="color: white;">{{ reservation.company.coordinatorPhoneNr }}</span>
     <q-tooltip :class="tooltipClass">
       <div>
         <span>Location: {{ reservation.location }}</span>
@@ -58,15 +59,16 @@ const unhoverFirstColumn = () => {
 <style lang="sass">
 .reservation-btn
   cursor: pointer
+  border: none
   height: 70%
   top: 15%
-  left: 55%
+  left: 25%
   position: absolute
   overflow: scroll
   -ms-overflow-style: none  ///* Hide scrollbar - IE and Edge */
   scrollbar-width: none  ///* Hide scrollbar - Firefox */
   z-index: 1
-  transform: skewx(-$skew-angle)
+  border-radius: 0px 50px 50px 0px
 
 /* Hide scrollbar - Chrome, Safari and Opera */
 .reservation-btn::-webkit-scrollbar
@@ -74,5 +76,4 @@ const unhoverFirstColumn = () => {
 
 .reservation-btn span
   display: block
-  transform: skewx($skew-angle)
 </style>

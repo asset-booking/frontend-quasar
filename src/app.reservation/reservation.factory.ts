@@ -29,13 +29,15 @@ class ReservationCompanyFactory {
     if (!src) return this.createDefault()
 
     const result = new ReservationCompany()
-    result.name = src?.name
+    result.name = src?.name ?? ''
     result.street = src?.street
     result.streetNumber = src?.streetNumber
     result.zipCode = src?.zipCode
     result.city = src?.city
-    result.email = src?.email
+    result.email = src?.email ?? ''
     result.telephoneNumber = src?.telephoneNumber
+    result.coordinatorPhoneNr = src?.coordinatorPhoneNr ?? ''
+    result.companyPhoneNr = src?.companyPhoneNr ?? ''
 
     return result
   }

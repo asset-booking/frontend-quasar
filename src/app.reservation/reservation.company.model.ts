@@ -1,9 +1,11 @@
 export class ReservationCompany {
-  name? = ''
+  name = ''
+  email = ''
+  companyPhoneNr = ''
+  coordinatorPhoneNr = ''
   street? = ''
   streetNumber? = ''
   zipCode? = ''
   city? = ''
-  email? = ''
   telephoneNumber? = ''
 }

@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { Asset, AssetOption } from 'src/app.asset/asset.model'
+import { assetService } from 'src/app.asset/asset.service'
 import { Reservation } from 'src/app.reservation/reservation.model'
 import { reservationService } from 'src/app.reservation/reservation.service'
 import { ReservationStatuses } from 'src/app.reservation/reservation.statuses'
 import { useDefaultsStore } from 'src/stores/defaults'
 import { useReservationStore } from 'src/stores/reservations'
 import { nightsBetweenDates } from 'src/utils/dates'
-import { emptyValueValidator, positiveNumberValidator } from 'src/validators/forms'
-import { computed, ref, watchEffect } from 'vue'
+import { positiveNumberValidator } from 'src/validators/forms'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import ReservationCompanyInfo from './ReservationCompanyInfo.vue'
 import ReservationPopCalendar from './ReservationPopCalendar.vue'
 
@@ -67,9 +69,45 @@ const updateReservationDates = (start: Date, end: Date) => {
 
 const selectedReservationStatusId = ref(reservation.value.statusId)
 
+const availableAssets = ref<Asset[]>([])
+const selectedAssets = ref<AssetOption[]>([])
+
+const assetOptions = ref<AssetOption[]>([])
+const filteredAssets = ref<AssetOption[]>(assetOptions.value)
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const filterAssets = (val: string, update: any) => {
+  update(() => {
+    if (val === '') {
+      filteredAssets.value = assetOptions.value
+    } else {
+      const needle = val.toLowerCase()
+      filteredAssets.value = assetOptions.value.filter(
+        a => a.addressRef.toLowerCase().indexOf(needle) > -1
+      )
+    }
+  })
+}
+
 watchEffect(() => {
   reservation.value.statusId = selectedReservationStatusId.value
   reservation.value.costs.numberOfNights = reservationNightsNumber.value
+})
+
+onMounted(async () => {
+  availableAssets.value = await assetService.getAll()
+  availableAssets.value.forEach(asset => {
+    assetOptions.value.push({
+      id: asset.id,
+      addressRef: asset.addressRef + (asset.specs ? ` - ${asset.specs}` : ''),
+      disabled: asset.id === props.reservation.assetId
+    })
+  })
+
+  const selectedAsset = assetOptions.value.find(a => a.id === props.reservation.assetId)
+  if (selectedAsset) {
+    selectedAssets.value.push(selectedAsset)
+  }
 })
 </script>
 
@@ -77,13 +115,29 @@ watchEffect(() => {
   <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-lg">
     <div class="row q-mt-xl">
       <div class="col-md-6 col-xs-12">
-        <q-field class="q-mb-xs" outlined readonly bg-color="light-blue-1">
-          <template v-slot:control>
-            <div class="self-center full-width no-outline">Object Id: {{ reservation.assetId }}</div>
+        <q-select class="q-mb-lg"
+          hide-bottom-space
+          options-dense
+          @filter="filterAssets"
+          use-input
+          input-debounce="200"
+          counter
+          hint="Selected assets"
+          hide-selected
+          filled
+          v-model="selectedAssets"
+          :options="filteredAssets"
+          option-disable="disabled"
+          label="Assets"
+          multiple>
+          <template v-slot:option="{ itemProps, opt, selected, toggleOption }">
+            <q-item v-bind="itemProps">
+              <q-item-section>
+                <q-checkbox :model-value="selected" @update:model-value="toggleOption(opt)" :label="opt.addressRef" />
+              </q-item-section>
+            </q-item>
           </template>
-        </q-field>
-        <q-input class="q-mb-xs" filled v-model="reservation.location" label="Location" lazy-rules
-          :rules="[emptyValueValidator]" />
+        </q-select>
 
         <reservation-pop-calendar @range-update="updateReservationDates" class="q-mb-xs" :start="reservation.startDate"
           :end="reservation.endDate" :asset-id="reservation.assetId" />
@@ -136,7 +190,7 @@ watchEffect(() => {
             </q-input>
           </div>
         </div>
-        <q-input class="q-mt-xs" bg-color="light-blue-2" filled outlined v-model.number="totalDisplay" readonly
+        <q-input class="q-mt-xs q-mb-lg" bg-color="light-blue-2" filled outlined v-model.number="totalDisplay" readonly
           type="number" input-style="text-align: right; font-weight: bold;">
           <template v-slot:prepend>
             <span class="text-weight-bold text-h6">Reservation Total:</span>

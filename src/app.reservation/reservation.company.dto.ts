@@ -6,4 +6,6 @@ export class ReservationCompanyDto {
   city?: string
   email?: string
   telephoneNumber?: string
+  companyPhoneNr?: string
+  coordinatorPhoneNr?: string
 }

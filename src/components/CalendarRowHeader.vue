@@ -6,11 +6,11 @@ const props = defineProps<{
 }>()
 
 const topSpecsBorder = {
-  borderTop: props.asset.specs ? '1px solid grey' : '1px'
+  borderTop: props.asset.specs || props.asset.specsIcons ? '1px solid grey' : '1px'
 }
 
 const topNotesBorder = {
-  borderTop: props.asset.specs ? '1px solid grey' : '1px'
+  borderTop: props.asset.specs || props.asset.notesIcons ? '1px solid grey' : '1px'
 }
 </script>
 
@@ -25,6 +25,7 @@ const topNotesBorder = {
       </tr>
       <tr>
         <div :style="topSpecsBorder">
+          <q-icon v-if="asset.specsIcons" :name="asset.specsIcons" size="2em" />
           <span>{{ asset.specs }}</span>
           <q-tooltip v-if="asset.specs">{{ asset.specs }}</q-tooltip>
         </div>
