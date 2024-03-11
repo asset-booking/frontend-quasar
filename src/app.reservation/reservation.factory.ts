@@ -1,5 +1,5 @@
 import { ReservationCompanyDto } from 'src/app.reservation/reservation.company.dto'
-import { ReservationCompany } from 'src/app.reservation/reservation.company.model'
+import { ReservationClient } from 'src/app.reservation/reservation.company.model'
 import { ReservationCostDto } from 'src/app.reservation/reservation.cost.dto'
 import { ReservationCost } from 'src/app.reservation/reservation.cost.model'
 import { ReservationDto } from 'src/app.reservation/reservation.dto'
@@ -8,12 +8,12 @@ import { ReservationStatuses } from 'src/app.reservation/reservation.statuses'
 import { addDays } from 'src/utils/dates'
 
 class ReservationCompanyFactory {
-  public createDefault (): ReservationCompany {
-    return new ReservationCompany()
+  public createDefault (): ReservationClient {
+    return new ReservationClient()
   }
 
-  public createFrom (src: ReservationCompany): ReservationCompany {
-    const result = new ReservationCompany()
+  public createFrom (src: ReservationClient): ReservationClient {
+    const result = new ReservationClient()
     result.name = src?.name
     result.street = src?.street
     result.streetNumber = src?.streetNumber
@@ -25,10 +25,10 @@ class ReservationCompanyFactory {
     return result
   }
 
-  public createFromDto (src: ReservationCompanyDto | undefined): ReservationCompany {
+  public createFromDto (src: ReservationCompanyDto | undefined): ReservationClient {
     if (!src) return this.createDefault()
 
-    const result = new ReservationCompany()
+    const result = new ReservationClient()
     result.name = src?.name
     result.street = src?.street
     result.streetNumber = src?.streetNumber
@@ -40,7 +40,7 @@ class ReservationCompanyFactory {
     return result
   }
 
-  public convertToDto (src: ReservationCompany): ReservationCompanyDto {
+  public convertToDto (src: ReservationClient): ReservationCompanyDto {
     const result = new ReservationCompanyDto()
     result.name = src?.name
     result.street = src?.street
@@ -95,13 +95,13 @@ class ReservationCostFactory {
 class ReservationFactory {
   public createDefault (): Reservation {
     const result = new Reservation()
-    result.id = -1
+    result.reservationId = -1
     result.assetId = -1
     result.startDate = new Date(new Date().toDateString())
     result.endDate = addDays(result.startDate, 1)
     result.statusId = ReservationStatuses.Open.id
-    result.company = companyFactory.createDefault()
-    result.costs = costsFactory.createDefault()
+    result.client = companyFactory.createDefault()
+    result.cost = costsFactory.createDefault()
     result.location = ''
 
     return result
@@ -109,13 +109,13 @@ class ReservationFactory {
 
   public createFrom (src: Reservation): Reservation {
     const result = new Reservation(src)
-    result.id = -1
+    result.reservationId = -1
     result.assetId = src.assetId
     result.startDate = src.startDate
     result.endDate = src.endDate
     result.statusId = src.statusId
-    result.company = companyFactory.createFrom(src.company)
-    result.costs = costsFactory.createFrom(src.costs)
+    result.client = companyFactory.createFrom(src.client)
+    result.cost = costsFactory.createFrom(src.cost)
     result.location = src.location
 
     return result
@@ -123,13 +123,13 @@ class ReservationFactory {
 
   public createFromDto (src: ReservationDto): Reservation {
     const result = new Reservation()
-    result.id = src.id
+    result.reservationId = src.id
     result.assetId = src.assetId
     result.startDate = new Date(new Date(src.startDate).toDateString())
     result.endDate = new Date(new Date(src.endDate).toDateString())
     result.statusId = src.statusId
-    result.company = companyFactory.createFromDto(src.company)
-    result.costs = costsFactory.createFromDto(src.costs)
+    result.client = companyFactory.createFromDto(src.company)
+    result.cost = costsFactory.createFromDto(src.costs)
     result.location = src.location
 
     return result
@@ -137,13 +137,13 @@ class ReservationFactory {
 
   public convertToDto (src: Reservation): ReservationDto {
     const result = new ReservationDto()
-    result.id = src.id
+    result.id = src.reservationId
     result.assetId = src.assetId
     result.startDate = src.startDate
     result.endDate = src.endDate
     result.statusId = src.statusId
-    result.company = companyFactory.convertToDto(src.company)
-    result.costs = costsFactory.convertToDto(src.costs)
+    result.company = companyFactory.convertToDto(src.client)
+    result.costs = costsFactory.convertToDto(src.cost)
     result.location = src.location
 
     return result

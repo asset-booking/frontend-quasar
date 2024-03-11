@@ -1,36 +1,37 @@
 <script setup lang="ts">
-import { Reservation } from 'src/app.reservation/reservation.model'
+import { AssetReservation } from 'src/app.asset/asset.model'
 import { ReservationStatuses } from 'src/app.reservation/reservation.statuses'
 import { convertToDateId, notifyButtonHovered, unhoverCalendarColumn } from 'src/utils/calendar'
 import { daysBetweenDates } from 'src/utils/dates'
 import { computed } from 'vue'
 
 const props = defineProps<{
-  reservation?: Reservation
+  reservation: AssetReservation
 }>()
 
 const getBtnStyle = () => {
-  const status = ReservationStatuses.getStatusbyId(props.reservation?.statusId)
+  const status = ReservationStatuses.getStatusbyId(props.reservation.statusId)
 
   if (status) {
-    return `${calculateReservationBtnWidth()}background: ${status.colorCode};`
+    return `${calculateReservationBtnWidth()};
+    background: radial-gradient(50px 100% at left, transparent 50%, ${status.colorCode} 0%);`
   }
 }
 
 const calculateReservationBtnWidth = () => {
   const numberOfDays = props.reservation
-    ? daysBetweenDates(props.reservation.startDate, props.reservation.endDate)
+    ? daysBetweenDates(props.reservation.start, props.reservation.end)
     : 0
 
-  return `width: calc(${numberOfDays * 100 - 110}% + ${numberOfDays}px);`
+  return `width: calc(${numberOfDays * 50}px - 30px)`
 }
 
-const tooltipClass = computed(() => `bg-${ReservationStatuses.getStatusbyId(props.reservation?.statusId)?.qColorCode}`)
+const tooltipClass = computed(() => `bg-${ReservationStatuses.getStatusbyId(props.reservation.statusId)?.qColorCode}`)
 
 const unhoverFirstColumn = () => {
   notifyButtonHovered(true)
-  if (props.reservation?.startDate) {
-    const dayId = convertToDateId(props.reservation?.startDate)
+  if (props.reservation.start) {
+    const dayId = convertToDateId(props.reservation.start)
     unhoverCalendarColumn(dayId)
   }
 }
@@ -42,14 +43,17 @@ const unhoverFirstColumn = () => {
     :style="getBtnStyle()"
     @mouseenter="unhoverFirstColumn"
     @mouseleave="() => notifyButtonHovered(false)">
-    <span v-if="reservation.company.name">{{ reservation.company.name }}</span>
-    <span v-if="reservation.company.telephoneNumber" class="q-ml-lg">{{ reservation.company.telephoneNumber }}</span>
+    <span style="color: white;">&euro;{{ reservation.total.toFixed(2) }} / {{ reservation.coordinatorPhoneNumber }}</span>
+    <span style="color: white;">{{ reservation.moderatorName }}</span>
     <q-tooltip :class="tooltipClass">
       <div>
-        <span>Location: {{ reservation.location }}</span>
+        <span>Total Cost: {{ reservation.total }} &#8364;</span>
       </div>
       <div>
-        <span>Total Cost: {{ reservation.costs.total }} &#8364;</span>
+        <span>Coordinator Phone Number: {{ reservation.coordinatorPhoneNumber }}</span>
+      </div>
+      <div>
+        <span>Moderator Name: {{ reservation.moderatorName }}</span>
       </div>
     </q-tooltip>
   </button>
@@ -58,15 +62,16 @@ const unhoverFirstColumn = () => {
 <style lang="sass">
 .reservation-btn
   cursor: pointer
+  border: none
   height: 70%
   top: 15%
-  left: 55%
+  left: 25%
   position: absolute
   overflow: scroll
   -ms-overflow-style: none  ///* Hide scrollbar - IE and Edge */
   scrollbar-width: none  ///* Hide scrollbar - Firefox */
   z-index: 1
-  transform: skewx(-$skew-angle)
+  border-radius: 0px 50px 50px 0px
 
 /* Hide scrollbar - Chrome, Safari and Opera */
 .reservation-btn::-webkit-scrollbar
@@ -74,5 +79,4 @@ const unhoverFirstColumn = () => {
 
 .reservation-btn span
   display: block
-  transform: skewx($skew-angle)
 </style>

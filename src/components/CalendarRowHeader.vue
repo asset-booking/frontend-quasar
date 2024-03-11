@@ -6,11 +6,11 @@ const props = defineProps<{
 }>()
 
 const topSpecsBorder = {
-  borderTop: props.asset.specs ? '1px solid grey' : '1px'
+  borderTop: props.asset.specification || props.asset.specificationIcons ? '1px solid grey' : '1px'
 }
 
 const topNotesBorder = {
-  borderTop: props.asset.specs ? '1px solid grey' : '1px'
+  borderTop: props.asset.notes ? '1px solid grey' : '1px'
 }
 </script>
 
@@ -19,20 +19,26 @@ const topNotesBorder = {
     <table>
       <tr>
         <div>
-          <span>{{ asset.addressRef }}</span>
-          <q-tooltip>{{ asset.addressRef }}</q-tooltip>
+          <span>{{ asset.categoryReference }}</span>
+          <q-tooltip>{{ asset.categoryReference }}</q-tooltip>
         </div>
       </tr>
       <tr>
         <div :style="topSpecsBorder">
-          <span>{{ asset.specs }}</span>
-          <q-tooltip v-if="asset.specs">{{ asset.specs }}</q-tooltip>
+          <template v-if="asset.specificationIcons">
+            <q-icon v-for="specIcon in asset.specificationIcons" :key="specIcon" :name="specIcon" size="2em" />
+          </template>
+          <span>{{ asset.specification }}</span>
+          <q-tooltip v-if="asset.specification">{{ asset.specification }}</q-tooltip>
         </div>
       </tr>
       <tr>
         <div :style="topNotesBorder">
+          <template v-if="asset.notesIcons">
+            <q-icon v-for="noteIcon in asset.notesIcons" :key="noteIcon" :name="noteIcon" size="2em" />
+          </template>
           <span>{{ asset.notes }}</span>
-          <q-tooltip v-if="asset.specs">{{ asset.notes }}</q-tooltip>
+          <q-tooltip v-if="asset.notes">{{ asset.notes }}</q-tooltip>
         </div>
       </tr>
     </table>

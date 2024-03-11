@@ -10,6 +10,6 @@ const props = defineProps<{
 </script>
 
 <template>
-  <CalendarRowHeader v-bind="props" />
-  <CalendarRowCells v-bind="props" />
+  <CalendarRowHeader :asset="props.asset" />
+  <CalendarRowCells :asset-id="props.asset.id" />
 </template>

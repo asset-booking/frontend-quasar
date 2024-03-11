@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { Reservation } from 'src/app.reservation/reservation.model'
-import { useReservationStore } from 'src/stores/reservations'
+import { AssetReservation, AssetSchedule } from 'src/app.asset/asset.model'
+import { useAssetsStore } from 'src/stores/assets'
 import { fromPopupCalendarDate, toPopupCalendarDate } from 'src/utils/date-picker'
 import { daysBetweenDates } from 'src/utils/dates'
 import { computed, ref } from 'vue'
@@ -22,8 +22,9 @@ const proxyRange = ref({
   to: toPopupCalendarDate(props.end)
 })
 
-const { assets } = storeToRefs(useReservationStore())
-const reservationAsset = computed(() => assets.value.find(a => a.id === props.assetId))
+const { assetsSchedules } = storeToRefs(useAssetsStore())
+const assetSchedule = computed<AssetSchedule | undefined>(() => assetsSchedules.value.find(a => a.assetId === props.assetId) as AssetSchedule)
+const scheduledReservations = computed<AssetReservation[]>(() => assetSchedule?.value?.reservations as AssetReservation[] ?? [])
 
 const reservationNightsNumber = computed(() => {
   let daysBetween = daysBetweenDates(props.start, props.end)
@@ -66,14 +67,14 @@ const filterReservedDates = (dateStr: string): boolean => {
     return true
   }
 
-  if (!reservationAsset.value) return true
+  if (scheduledReservations.value.length === 0) return true
 
   const intervalReserved = !!getReservationWithReservedDate(date)
   let dayReserved = false
 
   if (!intervalReserved) {
-    const startReserved = reservationAsset.value.reservations?.findIndex(r => date.getTime() === r.startDate.getTime())
-    const endReserved = reservationAsset.value.reservations?.findIndex(r => date.getTime() === r.endDate.getTime())
+    const startReserved = scheduledReservations.value.findIndex(r => date.getTime() === r.start.getTime())
+    const endReserved = scheduledReservations.value.findIndex(r => date.getTime() === r.end.getTime())
 
     dayReserved = !!(endReserved && endReserved !== -1) && !!(startReserved && startReserved !== -1)
   }
@@ -81,12 +82,12 @@ const filterReservedDates = (dateStr: string): boolean => {
   return !intervalReserved && !dayReserved
 }
 
-const getReservationWithReservedDate = (date: Date): Reservation | undefined => {
-  const reservation = reservationAsset.value?.reservations?.find(r =>
-    date.getTime() > r.startDate.getTime() &&
-    date.getTime() < r.endDate.getTime())
+const getReservationWithReservedDate = (date: Date): AssetReservation | undefined => {
+  const reservation = scheduledReservations.value.find(r =>
+    date.getTime() > r.start.getTime() &&
+    date.getTime() < r.end.getTime())
 
-  return reservation as Reservation
+  return reservation
 }
 
 </script>

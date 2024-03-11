@@ -1,9 +1,8 @@
-import { ReservationDto } from 'src/app.reservation/reservation.dto'
-
-export class AssetDto {
-  id!: number
-  addressRef!: string
-  specs?: string
-  notes?: string
-  reservations?: ReservationDto[]
+export interface AssetDto {
+  id: number
+  categoryReference: string
+  specification: string
+  specificationIcons: string[]
+  notes: string
+  notesIcons: string[]
 }

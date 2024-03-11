@@ -1,9 +1,30 @@
-import { Reservation } from 'src/app.reservation/reservation.model'
+export interface Asset {
+  id: number
+  categoryReference: string
+  specification: string
+  specificationIcons: string[]
+  notes: string
+  notesIcons: string[]
+}
 
-export class Asset {
-  id!: number
-  addressRef!: string
-  specs?: string
-  notes?: string
-  reservations?: Reservation[]
+export interface AssetSchedule {
+  assetId: number
+  scheduleId: number
+  reservations?: AssetReservation[]
+}
+
+export interface AssetReservation {
+  id: string
+  statusId: number
+  start: Date
+  end: Date
+  total: number
+  coordinatorPhoneNumber: string
+  moderatorName: string
+}
+
+export interface AssetOption {
+  id: number
+  categoryReferenceWithSpec: string
+  disabled: boolean
 }

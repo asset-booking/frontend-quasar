@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { assetService } from 'src/app.asset/asset.service'
-import { useReservationStore } from 'src/stores/reservations'
-import { notifyError } from 'src/utils/site'
-import { onMounted } from 'vue'
+import { useAssetsStore } from 'src/stores/assets'
+import { useCalendarStore } from 'src/stores/calendar'
+import { notifyErrorMessage } from 'src/utils/site'
+import { onBeforeMount } from 'vue'
 import CalendarDateRange from './CalendarDateRange.vue'
 import CalendarHeaderDays from './CalendarHeaderDays.vue'
 import CalendarHeaderMonths from './CalendarHeaderMonths.vue'
@@ -11,13 +12,18 @@ import CalendarRows from './CalendarRows.vue'
 import CalendarTodayFocus from './CalendarTodayFocus.vue'
 import ReservationModal from './ReservationModal.vue'
 
-const { assets } = storeToRefs(useReservationStore())
+const { assets, assetsSchedules } = storeToRefs(useAssetsStore())
+const { mainCalendarDateRange } = storeToRefs(useCalendarStore())
 
-onMounted(async () => {
+onBeforeMount(async () => {
   try {
     assets.value = await assetService.getAll()
+    assetsSchedules.value = await assetService.getAssetsSchedules(
+      assets.value,
+      mainCalendarDateRange.value.firstDate,
+      mainCalendarDateRange.value.lastDate)
   } catch (error: unknown) {
-    notifyError('Calendar reservations loading failed')
+    notifyErrorMessage('Calendar reservations loading failed')
     throw error
   }
 })

@@ -1,10 +1,11 @@
 <script setup lang='ts'>
 import { storeToRefs } from 'pinia'
 import { Asset } from 'src/app.asset/asset.model'
-import { useReservationStore } from 'src/stores/reservations'
+import { useAssetsStore } from 'src/stores/assets'
 import CalendarRow from './CalendarRow.vue'
 
-const { assets } = storeToRefs(useReservationStore())
+const { assets } = storeToRefs(useAssetsStore())
+
 </script>
 
 <template>

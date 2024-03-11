@@ -25,4 +25,4 @@ export const unhoverCalendarColumn = (dateString: string) => {
   }
 }
 
-export const convertToDateId = (date: Date): string => date.toDateString()
+export const convertToDateId = (date: Date): string => new Date(date).toDateString()

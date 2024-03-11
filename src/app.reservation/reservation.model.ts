@@ -1,36 +1,36 @@
-import { useDefaultsStore } from 'src/stores/defaults'
+import { ReservationClient } from 'src/app.client/client.model'
 import { addDays } from 'src/utils/dates'
-import { ReservationCompany } from './reservation.company.model'
 import { ReservationCost } from './reservation.cost.model'
 import { ReservationStatuses } from './reservation.statuses'
 
-/*  eslint space-before-function-paren: ['off']  */
-const { defaultStart, defaultEnd } = useDefaultsStore()
-
-export class Reservation {
-  constructor(reservation?: Partial<Reservation>) {
-    Object.assign(this, reservation)
+export class ReservationCreate {
+  constructor (assetId: number, startDate: Date) {
+    this.startDate = startDate
+    this.endDate = addDays(this.startDate, 1)
+    this.assetIds.push(assetId)
   }
 
-  id: number = -1
-  assetId = -1
-  startDate = new Date(new Date().toDateString())
-  endDate = addDays(this.startDate, 1)
+  assetIds: number[] = []
+  startDate: Date
+  endDate: Date
   statusId = ReservationStatuses.Open.id
-  company: ReservationCompany = new ReservationCompany()
-  costs: ReservationCost = new ReservationCost()
-  location?: string
+  clientId = ''
+  cost: ReservationCost = new ReservationCost()
 
-  public get isNew(): boolean {
-    return this.id === -1
-  }
-
-  clear() {
-    this.location = ''
-    this.startDate = defaultStart
-    this.endDate = defaultEnd
+  clear () {
+    this.startDate = new Date(new Date().toDateString())
+    this.endDate = addDays(this.startDate, 1)
     this.statusId = ReservationStatuses.Open.id
-    this.company = new ReservationCompany()
-    this.costs = new ReservationCost()
+    this.cost = new ReservationCost()
   }
+}
+
+export interface Reservation {
+  reservationId: string
+  assetId: number
+  statusId: number
+  startDate: Date
+  endDate: Date
+  client: ReservationClient
+  cost: ReservationCost
 }
