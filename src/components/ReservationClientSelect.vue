@@ -49,6 +49,6 @@ watchEffect(() => {
     hide-selected
     fill-input
     input-debounce="200"
-    label="Client"
+    label="Company Name"
     option-label="companyName" />
 </template>

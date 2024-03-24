@@ -4,7 +4,8 @@ import { assetService } from 'src/app.asset/asset.service'
 import { onMounted, ref, watchEffect } from 'vue'
 
 const props = defineProps<{
-  selectedAssetId?: number
+  selectedAssetId?: number,
+  disableAll?: boolean
 }>()
 
 /*  eslint func-call-spacing: ["off"]  */
@@ -36,7 +37,7 @@ onMounted(async () => {
     availableAssets.value.push({
       id: asset.id,
       categoryReferenceWithSpec: asset.categoryReference + ` - ${asset.specification}`,
-      disabled: false
+      disabled: props.disableAll
     })
   })
 

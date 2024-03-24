@@ -26,3 +26,14 @@ export const unhoverCalendarColumn = (dateString: string) => {
 }
 
 export const convertToDateId = (date: Date): string => new Date(date).toDateString()
+
+export const scrollToToday = () => {
+  const elementId = convertToDateId(new Date())
+  const element = document.getElementById(elementId)
+  element?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'center' })
+  hoverCalendarColumn(elementId)
+
+  setTimeout(() => {
+    unhoverCalendarColumn(elementId)
+  }, 3000)
+}

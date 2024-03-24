@@ -4,6 +4,7 @@ import CalendarRowCell from './CalendarRowCell.vue'
 
 const props = defineProps<{
   assetId: number
+  scheduleId: number
 }>()
 
 const calendarStore = useCalendarStore()
@@ -13,5 +14,6 @@ const calendarStore = useCalendarStore()
 <template>
   <CalendarRowCell v-for="(day) in calendarStore.calendarDays" :key="day.id"
     :asset-id="props.assetId"
+    :schedule-id="props.scheduleId"
     :calendar-day="day"/>
 </template>

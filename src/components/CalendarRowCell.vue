@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { CalendarDay } from 'src/app.calendar/calendar.model'
 import { useAssetsStore } from 'src/stores/assets'
 import { convertToDateId, hoverCalendarColumn, unhoverCalendarColumn } from 'src/utils/calendar'
@@ -8,12 +9,13 @@ import CalendarRowCellReservationBtn from './CalendarRowCellReservationBtn.vue'
 
 const props = defineProps<{
   assetId: number
+  scheduleId: number
   calendarDay: CalendarDay
 }>()
 
-const { assetsSchedules } = useAssetsStore()
+const { assetsSchedules } = storeToRefs(useAssetsStore())
 const reservation = computed(() => {
-  const assetSchedule = assetsSchedules.find(s => s.assetId === props.assetId)
+  const assetSchedule = assetsSchedules.value.find(s => s.assetId === props.assetId)
   return assetSchedule?.reservations?.find(({ start }) => new Date(start).getTime() === props.calendarDay.date.getTime())
 })
 
@@ -27,7 +29,7 @@ const cellClasses = computed(() => {
 
 const calendarDateId = computed(() => convertToDateId(props.calendarDay.date))
 const openReservation = () => {
-  openReservationModal(props.assetId, props.calendarDay.date, reservation.value?.id)
+  openReservationModal(props.assetId, props.scheduleId, props.calendarDay.date, reservation.value?.id)
 }
 </script>
 

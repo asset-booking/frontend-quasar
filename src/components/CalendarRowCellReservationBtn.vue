@@ -43,8 +43,8 @@ const unhoverFirstColumn = () => {
     :style="getBtnStyle()"
     @mouseenter="unhoverFirstColumn"
     @mouseleave="() => notifyButtonHovered(false)">
-    <span style="color: white;">&euro;{{ reservation.total.toFixed(2) }} / {{ reservation.coordinatorPhoneNumber }}</span>
-    <span style="color: white;">{{ reservation.moderatorName }}</span>
+    <span>&euro;{{ reservation.total.toFixed(2) }} / {{ reservation.coordinatorPhoneNumber }}</span>
+    <span>{{ reservation.moderatorName }}</span>
     <q-tooltip :class="tooltipClass">
       <div>
         <span>Total Cost: {{ reservation.total }} &#8364;</span>
@@ -72,6 +72,9 @@ const unhoverFirstColumn = () => {
   scrollbar-width: none  ///* Hide scrollbar - Firefox */
   z-index: 1
   border-radius: 0px 50px 50px 0px
+  span
+    color: white
+    padding-left: 20px
 
 /* Hide scrollbar - Chrome, Safari and Opera */
 .reservation-btn::-webkit-scrollbar

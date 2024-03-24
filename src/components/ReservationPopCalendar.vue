@@ -12,9 +12,12 @@ const emits = defineEmits<{
 }>()
 
 const props = defineProps<{
-  assetId: number,
+  scheduleId: number,
   start: Date,
-  end: Date
+  end: Date,
+  reservationId?: string,
+  hideButton?: boolean,
+  isReadonly?: boolean
 }>()
 
 const proxyRange = ref({
@@ -23,8 +26,12 @@ const proxyRange = ref({
 })
 
 const { assetsSchedules } = storeToRefs(useAssetsStore())
-const assetSchedule = computed<AssetSchedule | undefined>(() => assetsSchedules.value.find(a => a.assetId === props.assetId) as AssetSchedule)
-const scheduledReservations = computed<AssetReservation[]>(() => assetSchedule?.value?.reservations as AssetReservation[] ?? [])
+const assetSchedule = computed<AssetSchedule | undefined>(() => assetsSchedules.value.find(a => a.scheduleId === props.scheduleId) as AssetSchedule)
+const scheduledReservations = computed<AssetReservation[]>(() => {
+  let reservations = assetSchedule?.value?.reservations as AssetReservation[] ?? []
+  reservations = reservations.filter(r => r.id !== props.reservationId)
+  return reservations
+})
 
 const reservationNightsNumber = computed(() => {
   let daysBetween = daysBetweenDates(props.start, props.end)
@@ -93,8 +100,8 @@ const getReservationWithReservedDate = (date: Date): AssetReservation | undefine
 </script>
 
 <template>
-  <q-field filled>
-    <template v-slot:after>
+  <q-field filled :readonly="props.isReadonly">
+    <template v-slot:after v-if="!props.hideButton">
       <q-btn class="calendar-btn" icon="event" round color="teal">
         <q-popup-proxy cover transition-show="scale" transition-hide="scale">
           <q-date v-model="proxyRange" range first-day-of-week="1" :options="filterReservedDates">

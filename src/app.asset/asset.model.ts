@@ -3,8 +3,8 @@ export interface Asset {
   categoryReference: string
   specification: string
   specificationIcons: string[]
-  notes: string
-  notesIcons: string[]
+  note: string
+  noteIcons: string[]
 }
 
 export interface AssetSchedule {

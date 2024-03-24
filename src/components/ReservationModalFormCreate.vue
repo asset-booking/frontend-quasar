@@ -4,29 +4,30 @@ import { ReservationClient } from 'src/app.client/client.model'
 import { ReservationCost } from 'src/app.reservation/reservation.cost.model'
 import { ReservationCreate } from 'src/app.reservation/reservation.model'
 import { reservationService } from 'src/app.reservation/reservation.service'
-import { ReservationStatuses } from 'src/app.reservation/reservation.statuses'
 import { useAssetsStore } from 'src/stores/assets'
 import { useClientModalStore } from 'src/stores/clientModal'
 import { useReservationModalStore } from 'src/stores/reservationModal'
 import { nightsBetweenDates } from 'src/utils/dates'
+import { closeReservationModal } from 'src/utils/modal'
 import { computed, ref, watchEffect } from 'vue'
 import ClientModalFormCreate from './ClientModalFormCreate.vue'
 import ReservationAssetSelect from './ReservationAssetSelect.vue'
 import ReservationClientInfo from './ReservationClientInfo.vue'
 import ReservationClientSelect from './ReservationClientSelect.vue'
 import ReservationModalCost from './ReservationModalCost.vue'
+import ReservationModalFormStatusSelect from './ReservationModalFormStatusSelect.vue'
 import ReservationPopCalendar from './ReservationPopCalendar.vue'
 
-const { promptReservation, reservationModalInfo } = storeToRefs(useReservationModalStore())
+const { reservationModalInfo } = storeToRefs(useReservationModalStore())
 const { promptNewClient } = storeToRefs(useClientModalStore())
 const { assetsSchedules } = storeToRefs(useAssetsStore())
 
 const props = defineProps<{
-  reservation: ReservationCreate
+  scheduleId: number,
+  startDate: Date
 }>()
 
-const currentReservation = ref<ReservationCreate>(props.reservation)
-const selectedReservationStatusId = ref(props.reservation.statusId)
+const currentReservation = ref<ReservationCreate>(new ReservationCreate(props.scheduleId, props.startDate))
 const selectedReservationClient = ref<ReservationClient>({
   clientId: '',
   companyName: '',
@@ -36,40 +37,33 @@ const selectedReservationClient = ref<ReservationClient>({
 })
 
 const onReset = () => {
-  props.reservation.clear()
-  selectedReservationStatusId.value = props.reservation.statusId
+  currentReservation.value.clear()
 }
 
 const onSubmit = async () => {
-  const success = await reservationService.create(currentReservation.value as ReservationCreate)
-  if (!success) {
-    return
-  }
+  const result = await reservationService.create(currentReservation.value as ReservationCreate)
+  if (!result) return
 
-  currentReservation.value.assetIds.forEach(assetId => {
-    const assetSchedule = assetsSchedules.value.find(a => a.assetId === assetId)
+  currentReservation.value.scheduleReservationIds.forEach(schResId => {
+    const assetSchedule = assetsSchedules.value.find(a => a.scheduleId === schResId.scheduleId)
     if (assetSchedule) {
       if (!assetSchedule.reservations) {
         assetSchedule.reservations = []
       }
 
       assetSchedule.reservations.push({
-        id: '',
+        id: schResId.reservationId,
         statusId: currentReservation.value.statusId,
         start: currentReservation.value.startDate,
         end: currentReservation.value.endDate,
-        total: currentReservation.value.cost.total,
+        total: currentReservation.value.cost.totalCost,
         coordinatorPhoneNumber: selectedReservationClient.value?.coordinatorPhoneNumber ?? '',
         moderatorName: 'current moderator'
       })
     }
 
-    promptReservation.value = false
+    closeReservationModal()
   })
-}
-
-const onDeleteReservation = async () => {
-  alert('deleted')
 }
 
 const reservationNightsNumber = computed(() =>
@@ -89,8 +83,20 @@ const updateReservationClient = (selectedClient: ReservationClient) => {
   selectedReservationClient.value = selectedClient
 }
 
+const addSelectedAsset = (assetIds: number[]) => {
+  assetIds.forEach(id => {
+    const scheduleId = assetsSchedules.value.find(a => a.assetId === id)?.scheduleId
+    if (scheduleId) {
+      currentReservation.value.addForScheduleId(scheduleId)
+    }
+  })
+}
+
+const onSelectedStatusChanged = (newStatusId: number) => {
+  currentReservation.value.statusId = newStatusId
+}
+
 watchEffect(() => {
-  currentReservation.value.statusId = selectedReservationStatusId.value
   currentReservation.value.cost.numberOfNights = reservationNightsNumber.value
 })
 </script>
@@ -99,12 +105,15 @@ watchEffect(() => {
   <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-lg">
     <div class="row q-mt-xl">
       <div class="col-md-6 col-xs-12">
-        <ReservationAssetSelect :selectedAssetId="reservationModalInfo?.assetId" />
+        <ReservationAssetSelect :selectedAssetId="reservationModalInfo?.assetId" @asset-selected="addSelectedAsset" />
 
-        <reservation-pop-calendar @range-update="updateReservationDates" class="q-mb-xs" :start="reservation.startDate"
-          :end="reservation.endDate" :asset-id="reservationModalInfo?.assetId ?? currentReservation.assetIds[0]" />
+        <reservation-pop-calendar @range-update="updateReservationDates" class="q-mb-xs"
+          :start="currentReservation.startDate"
+          :end="currentReservation.endDate"
+          :schedule-id="reservationModalInfo?.scheduleId
+            ?? currentReservation.scheduleReservationIds[0].scheduleId" />
 
-        <reservation-modal-cost :cost="reservation.cost" @cost-update="updateCost" />
+        <reservation-modal-cost :number-of-nights="reservationNightsNumber" @cost-update="updateCost" />
       </div>
       <div class="col-md-6 col-xs-12 q-pl-md-md">
         <div class="row">
@@ -118,20 +127,16 @@ watchEffect(() => {
             <reservation-client-info :client="selectedReservationClient" />
           </div>
           <div class="col-12 q-mt-md">
-            <div class="row q-gutter-sm">
-              <q-radio class="col-md-4" v-for="status in ReservationStatuses.getAllStatuses()" :key="status.id" keep-color
-                v-model="selectedReservationStatusId" :val="status.id" :label="status.name" :color="status.qColorCode" />
-            </div>
+            <reservation-modal-form-status-select
+              :status-id="currentReservation.statusId"
+              @status-updated="onSelectedStatusChanged"/>
           </div>
         </div>
       </div>
     </div>
     <div>
       <q-btn label="Submit" type="submit" color="primary" />
-      <q-btn label="Cancel" class="q-ml-sm" color="primary" flat v-close-popup />
       <q-btn label="Clear" type="reset" class="q-ml-sm" color="warning" flat />
-      <q-btn label="Delete" type="button" class="q-ml-sm" color="negative" @click="onDeleteReservation" flat
-        v-close-popup />
     </div>
   </q-form>
 </template>

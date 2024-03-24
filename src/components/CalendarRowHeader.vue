@@ -10,7 +10,7 @@ const topSpecsBorder = {
 }
 
 const topNotesBorder = {
-  borderTop: props.asset.notes ? '1px solid grey' : '1px'
+  borderTop: props.asset.note ? '1px solid grey' : '1px'
 }
 </script>
 
@@ -34,11 +34,11 @@ const topNotesBorder = {
       </tr>
       <tr>
         <div :style="topNotesBorder">
-          <template v-if="asset.notesIcons">
-            <q-icon v-for="noteIcon in asset.notesIcons" :key="noteIcon" :name="noteIcon" size="2em" />
+          <template v-if="asset.noteIcons">
+            <q-icon v-for="noteIcon in asset.noteIcons" :key="noteIcon" :name="noteIcon" size="1.5em" />
           </template>
-          <span>{{ asset.notes }}</span>
-          <q-tooltip v-if="asset.notes">{{ asset.notes }}</q-tooltip>
+          <span>{{ asset.note }}</span>
+          <q-tooltip v-if="asset.note">{{ asset.note }}</q-tooltip>
         </div>
       </tr>
     </table>

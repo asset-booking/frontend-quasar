@@ -3,14 +3,15 @@ import { storeToRefs } from 'pinia'
 import { assetService } from 'src/app.asset/asset.service'
 import { useAssetsStore } from 'src/stores/assets'
 import { useCalendarStore } from 'src/stores/calendar'
+import { scrollToToday } from 'src/utils/calendar'
 import { notifyErrorMessage } from 'src/utils/site'
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, onMounted } from 'vue'
 import CalendarDateRange from './CalendarDateRange.vue'
 import CalendarHeaderDays from './CalendarHeaderDays.vue'
 import CalendarHeaderMonths from './CalendarHeaderMonths.vue'
 import CalendarRows from './CalendarRows.vue'
 import CalendarTodayFocus from './CalendarTodayFocus.vue'
-import ReservationModal from './ReservationModal.vue'
+import ReservationModalForm from './ReservationModalForm.vue'
 
 const { assets, assetsSchedules } = storeToRefs(useAssetsStore())
 const { mainCalendarDateRange } = storeToRefs(useCalendarStore())
@@ -26,6 +27,10 @@ onBeforeMount(async () => {
     notifyErrorMessage('Calendar reservations loading failed')
     throw error
   }
+})
+
+onMounted(() => {
+  setTimeout(() => scrollToToday(), 100)
 })
 </script>
 
@@ -48,7 +53,7 @@ onBeforeMount(async () => {
   </div>
 </div>
   <div>
-    <ReservationModal />
+    <ReservationModalForm />
   </div>
 </template>
 
